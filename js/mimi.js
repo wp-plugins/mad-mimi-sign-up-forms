@@ -17,9 +17,12 @@
 			
 			var $wrapper = $( this ),
 				$spinner = $( '.mimi-spinner', $wrapper ),
+				/* needed only when using WP as a proxy.
 				payload = $.extend( {}, $( this ).mimiSerializeObject(), {
 					action: 'mimi-submit-form'
 				} ),
+				*/
+				payload = $( this ).serialize(),
 				invalidElements = [],
 				m = MadMimi;
 
@@ -27,8 +30,8 @@
 			$wrapper.find( 'input.mimi-invalid' ).removeClass( 'mimi-invalid' );
 
 			$( this ).find( ':input' ).each( function( i ) {
-				if ( 
-					'signup[email]' == $( this ).attr( 'name' ) 
+			 	if (
+					'signup[email]' == $( this ).attr( 'name' )
 					&& ! MadMimi.isEmail( $( this ).val() ) 
 				) {
 					// email not valid
@@ -56,11 +59,13 @@
 							var d = response.result,
 								is_suppressed = d.audience_member.suppressed;
 
+							if(d.has_redirect) window.location.href = d.redirect;
+
 							$wrapper.html( MadMimi.addMessage( 
 								is_suppressed ? [ 'suppressed', 'success' ] : [ 'info', 'success' ], 
 								is_suppressed ? MadMimi.thankyou_suppressed : MadMimi.thankyou ) 
 							).fadeIn( 'fast' );
-							
+
 						} else {
 							$wrapper.html( MadMimi.addMessage( 'info', MadMimi.oops ) ).fadeIn( 'fast' );
 						}
@@ -68,7 +73,7 @@
 					} );
 
 				}, 'jsonp' );
-					
+
 			} else {
 				// there are invalid elements
 				$( invalidElements ).each( function( i, el ) {
